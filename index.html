@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Empório &amp; Café Grão da Serra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700&family=Courier+Prime:wght@400;700&family=Grenze+Gotisch:wght@500;700&display=swap">
+<link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+<div class="app">
+  <header class="topo">
+    <div class="dentro">
+      <div class="topo-linha">
+        <a class="marca" href="#cardapio" aria-label="Grão da Serra, ir ao cardápio">
+          <svg class="emblema" viewBox="0 0 44 40" width="44" height="40" aria-hidden="true">
+            <path d="M3 19 L22 4 L41 19" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"></path>
+            <path d="M8 17 V36 H36 V17" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"></path>
+            <path d="M8 26 H36 M22 8 V36 M8 17 L22 26 L36 17" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0.75"></path>
+          </svg>
+          <span class="marca-texto">
+            <span class="marca-nome">Grão da Serra</span>
+            <span class="marca-sub">Empório &amp; Café · sistema de pedidos</span>
+          </span>
+        </a>
+        <div class="ferramentas">
+          <span class="selo-demo" id="badge-demo" hidden>Dados fictícios</span>
+          <button type="button" class="btn btn-sec btn-mini" id="btn-explica" aria-pressed="true">Explicações: ligadas</button>
+          <button type="button" class="btn btn-sec btn-mini" id="btn-tema">Modo escuro</button>
+        </div>
+      </div>
+    </div>
+    <nav class="nav dentro" aria-label="Telas do sistema">
+      <a href="#cardapio" data-tela="cardapio">Cardápio</a>
+      <a href="#novo-pedido" data-tela="novo-pedido">Novo pedido</a>
+      <a href="#pedidos" data-tela="pedidos">Pedidos</a>
+      <a href="#gerencia" data-tela="gerencia">Gerência</a>
+      <a href="#bastidores" data-tela="bastidores">Bastidores</a>
+    </nav>
+    <div class="comunicador" id="comunicador" role="status" aria-live="polite" data-tipo="info">
+      <div class="dentro com-miolo">
+        <span class="com-rotulo" id="com-rotulo">AVISO</span>
+        <span class="com-texto" id="com-texto">Nenhuma mensagem do banco por enquanto.</span>
+        <button type="button" class="btn btn-sec btn-mini btn-icone com-limpar" id="com-limpar" aria-label="Limpar mensagem">×</button>
+      </div>
+    </div>
+  </header>
+  <div class="viga" aria-hidden="true"></div>
+
+  <main class="dentro">
+
+    <!-- TELA 1 · CARDÁPIO -->
+    <section id="tela-cardapio" class="tela" aria-labelledby="t-cardapio">
+      <div class="tela-cab">
+        <h2 id="t-cardapio">Cardápio</h2>
+        <p class="fonte">fonte: vw_cardapio · <span id="cardapio-qtd">carregando</span></p>
+      </div>
+      <div id="cardapio-lista"><p class="vazio">Carregando cardápio…</p></div>
+    </section>
+
+    <!-- TELA 2 · NOVO PEDIDO -->
+    <section id="tela-novo-pedido" class="tela" aria-labelledby="t-novo" hidden>
+      <div class="tela-cab">
+        <h2 id="t-novo">Novo pedido</h2>
+        <p class="fonte">sp_abrir_pedido · sp_adicionar_item · sp_finalizar_pedido</p>
+      </div>
+      <div class="colunas">
+        <div class="coluna">
+          <form id="f-abrir" class="painel" novalidate>
+            <h3 class="etapa-titulo"><span class="etapa-n">1</span>Abrir pedido</h3>
+            <div class="campo">
+              <label for="sel-cliente">Cliente</label>
+              <select id="sel-cliente"></select>
+            </div>
+            <div class="campo">
+              <label for="sel-func">Atendente</label>
+              <select id="sel-func"></select>
+            </div>
+            <button type="submit" class="btn">Abrir pedido</button>
+          </form>
+
+          <form id="f-item" class="painel" novalidate>
+            <fieldset id="fs-item" disabled>
+              <h3 class="etapa-titulo"><span class="etapa-n">2</span>Adicionar produto</h3>
+              <div class="par">
+                <div class="campo">
+                  <label for="sel-produto">Produto</label>
+                  <select id="sel-produto"></select>
+                </div>
+                <div class="campo">
+                  <label for="inp-qtd">Qtd</label>
+                  <input id="inp-qtd" type="number" value="1" step="1">
+                </div>
+              </div>
+              <button type="submit" class="btn">Adicionar</button>
+            </fieldset>
+          </form>
+        </div>
+
+        <div class="coluna">
+          <div class="painel">
+            <div class="pedido-cab">
+              <h3 id="pedido-titulo">Nenhum pedido em andamento</h3>
+              <span id="pedido-status"></span>
+            </div>
+            <div id="itens-area"><p class="vazio">Abra um pedido na etapa 1 para começar a adicionar produtos.</p></div>
+            <fieldset id="fs-fim" disabled>
+              <div class="fim">
+                <p class="parcial">Valor bruto parcial<strong id="total-parcial">—</strong></p>
+                <button type="button" class="btn" id="btn-finalizar"><span class="etapa-n etapa-n-botao">3</span>Finalizar e pagar</button>
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="resultado" id="resultado" role="status" hidden>
+            <p class="res-titulo" id="res-titulo">Pedido pago</p>
+            <dl class="res-grade">
+              <div><dt>Desconto de fidelidade</dt><dd id="res-desconto">—</dd></div>
+              <div><dt>Valor total</dt><dd id="res-total">—</dd></div>
+            </dl>
+            <button type="button" class="btn btn-sec" id="btn-novo">Iniciar outro pedido</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TELA 3 · PEDIDOS -->
+    <section id="tela-pedidos" class="tela" aria-labelledby="t-pedidos" hidden>
+      <div class="tela-cab">
+        <h2 id="t-pedidos">Pedidos</h2>
+        <p class="fonte">fonte: vw_pedidos_detalhados · <span id="pedidos-qtd">carregando</span></p>
+      </div>
+      <div class="filtros" id="pedidos-filtros" role="group" aria-label="Filtrar por status">
+        <button type="button" class="chip" data-filtro="" aria-pressed="true">Todos</button>
+        <button type="button" class="chip" data-filtro="ABERTO" aria-pressed="false">Aberto</button>
+        <button type="button" class="chip" data-filtro="PAGO" aria-pressed="false">Pago</button>
+        <button type="button" class="chip" data-filtro="CANCELADO" aria-pressed="false">Cancelado</button>
+      </div>
+      <div class="painel" id="pedidos-tabela"><p class="vazio">Carregando pedidos…</p></div>
+    </section>
+
+    <!-- TELA 4 · GERÊNCIA -->
+    <section id="tela-gerencia" class="tela" aria-labelledby="t-gerencia" hidden>
+      <div class="tela-cab">
+        <h2 id="t-gerencia">Gerência</h2>
+        <p class="fonte">views de relatório · reajuste · auditoria</p>
+      </div>
+      <div class="grade-ger">
+        <div class="painel">
+          <h3 class="painel-titulo">Produtos para repor</h3>
+          <p class="fonte">fonte: vw_produtos_para_repor</p>
+          <div id="repor-tabela"><p class="vazio">Carregando…</p></div>
+        </div>
+
+        <div class="painel">
+          <h3 class="painel-titulo">Vendas por categoria</h3>
+          <p class="fonte">fonte: vw_vendas_por_categoria · só pedidos pagos</p>
+          <div id="vendas-lista"><p class="vazio">Carregando…</p></div>
+        </div>
+
+        <form id="f-reajuste" class="painel" novalidate>
+          <h3 class="painel-titulo">Reajuste de preços</h3>
+          <p class="fonte">aciona sp_reajustar_precos_categoria</p>
+          <div class="campo">
+            <label for="sel-categoria">Categoria</label>
+            <select id="sel-categoria"></select>
+          </div>
+          <div class="campo">
+            <label for="inp-percentual">Percentual (%)</label>
+            <input id="inp-percentual" type="number" step="any" placeholder="10 para aumento, -5 para redução">
+          </div>
+          <div class="confirma" id="reaj-confirma" hidden>
+            <p id="reaj-texto"></p>
+            <div class="linha-botoes">
+              <button type="button" class="btn" id="btn-reaj-ok">Confirmar reajuste</button>
+              <button type="button" class="btn btn-sec" id="btn-reaj-cancelar">Cancelar</button>
+            </div>
+          </div>
+          <button type="submit" class="btn" id="btn-reaj">Aplicar reajuste</button>
+        </form>
+
+        <div class="painel">
+          <h3 class="painel-titulo">Histórico de preços</h3>
+          <p class="fonte">fonte: tabela historico_preco · mais recentes primeiro</p>
+          <div id="historico-tabela"><p class="vazio">Carregando…</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TELA 5 · BASTIDORES (o que explicar na apresentação) -->
+    <section id="tela-bastidores" class="tela" aria-labelledby="t-bastidores" hidden>
+      <div class="tela-cab">
+        <h2 id="t-bastidores">Bastidores</h2>
+      </div>
+
+      <div class="subnav" role="tablist" aria-label="Assuntos da apresentação">
+        <button type="button" class="chip" role="tab" id="aba-recursos" aria-controls="painel-recursos" aria-selected="true" data-aba="recursos">Os 4 recursos</button>
+        <button type="button" class="chip" role="tab" id="aba-mapa" aria-controls="painel-mapa" aria-selected="false" tabindex="-1" data-aba="mapa">Mapa das questões</button>
+        <button type="button" class="chip" role="tab" id="aba-fluxos" aria-controls="painel-fluxos" aria-selected="false" tabindex="-1" data-aba="fluxos">Caminho de uma ação</button>
+        <button type="button" class="chip" role="tab" id="aba-conexao" aria-controls="painel-conexao" aria-selected="false" tabindex="-1" data-aba="conexao">Conexão com o banco</button>
+        <button type="button" class="chip" role="tab" id="aba-roteiro" aria-controls="painel-roteiro" aria-selected="false" tabindex="-1" data-aba="roteiro">Demonstração</button>
+      </div>
+
+      <!-- ABA 1 · OS 4 RECURSOS -->
+      <div id="painel-recursos" class="pilha" role="tabpanel" aria-labelledby="aba-recursos">
+        <div class="painel">
+          <h3 class="painel-titulo">A ideia central</h3>
+          <p class="texto">Vários sistemas usam o mesmo banco: o aplicativo do balcão, o caixa e os relatórios da gerência. Por isso as regras do negócio ficam no próprio banco. Qualquer sistema que se conecte segue as mesmas regras, sem precisar reprogramá-las. O objetivo do exercício é perceber em que situação cada recurso é a escolha mais adequada.</p>
+        </div>
+
+        <div class="recursos">
+          <article class="painel recurso">
+            <span class="tipo tipo-function">Function</span>
+            <h3>Calcula e devolve um valor</h3>
+            <dl>
+              <div><dt>O que é</dt><dd>Recebe parâmetros, faz um cálculo e devolve um único valor. Pode ser usada dentro de um SELECT, de uma view, de uma procedure ou de um trigger.</dd></div>
+              <div><dt>Use quando</dt><dd>A mesma conta ou regra aparece em vários lugares. Escrita uma vez, todos chegam ao mesmo resultado. Se a regra mudar, muda em um ponto só.</dd></div>
+              <div><dt>No projeto</dt><dd>fn_total_pedido, fn_situacao_estoque, fn_desconto_fidelidade.</dd></div>
+              <div><dt>Em uma frase</dt><dd class="frase">Calcula uma vez, e todo mundo chega ao mesmo resultado.</dd></div>
+            </dl>
+          </article>
+
+          <article class="painel recurso">
+            <span class="tipo tipo-procedure">Procedure</span>
+            <h3>Executa uma operação do negócio</h3>
+            <dl>
+              <div><dt>O que é</dt><dd>Agrupa vários comandos em uma operação, chamada com CALL.</dd></div>
+              <div><dt>Use quando</dt><dd>A operação altera dados e precisa de validação. Quem chama só informa os parâmetros, e o banco garante todos os passos, sempre na mesma ordem. Quando algo não pode ser feito, a procedure para com SIGNAL e uma mensagem em português.</dd></div>
+              <div><dt>No projeto</dt><dd>sp_abrir_pedido, sp_adicionar_item, sp_finalizar_pedido, sp_reajustar_precos_categoria.</dd></div>
+              <div><dt>Em uma frase</dt><dd class="frase">O banco garante os passos, e a tela só pede.</dd></div>
+            </dl>
+          </article>
+
+          <article class="painel recurso">
+            <span class="tipo tipo-view">View</span>
+            <h3>Entrega os dados prontos</h3>
+            <dl>
+              <div><dt>O que é</dt><dd>Uma consulta salva com um nome, usada como se fosse uma tabela.</dd></div>
+              <div><dt>Use quando</dt><dd>Cada sistema ou perfil precisa de exatamente os dados que lhe cabem. Quem consulta não precisa conhecer os JOINs nem enxerga colunas que não deveria ver.</dd></div>
+              <div><dt>No projeto</dt><dd>vw_cardapio, vw_pedidos_detalhados, vw_produtos_para_repor, vw_vendas_por_categoria.</dd></div>
+              <div><dt>Em uma frase</dt><dd class="frase">A tela faz um SELECT simples, e o JOIN fica escondido na view.</dd></div>
+            </dl>
+          </article>
+
+          <article class="painel recurso">
+            <span class="tipo tipo-trigger">Trigger</span>
+            <h3>Acontece sozinho</h3>
+            <dl>
+              <div><dt>O que é</dt><dd>Um bloco que o banco executa antes (BEFORE) ou depois (AFTER) de um INSERT, UPDATE ou DELETE em uma tabela.</dd></div>
+              <div><dt>Use quando</dt><dd>Algo precisa acontecer sempre, sem depender de alguém lembrar: manter dados consistentes, registrar auditoria e bloquear alterações indevidas, venha o comando de onde vier.</dd></div>
+              <div><dt>No projeto</dt><dd>trg_item_baixa_estoque, trg_item_devolve_estoque, trg_produto_historico_preco, trg_pedido_bloqueia_alteracao. NEW vale no INSERT e OLD no DELETE. O bloqueio é BEFORE porque age antes de gravar.</dd></div>
+              <div><dt>Em uma frase</dt><dd class="frase">Acontece sozinho, até para quem mexe direto no Workbench.</dd></div>
+            </dl>
+          </article>
+        </div>
+
+      </div>
+
+      <!-- ABA 2 · MAPA DAS QUESTÕES -->
+      <div id="painel-mapa" class="pilha" role="tabpanel" aria-labelledby="aba-mapa" hidden>
+        <div class="painel">
+          <h3 class="painel-titulo">As 15 questões e onde cada uma aparece</h3>
+          <p class="fonte">use o filtro para falar de um tipo de cada vez</p>
+          <div class="filtros" id="mapa-filtros" role="group" aria-label="Filtrar por tipo">
+            <button type="button" class="chip" data-tipo-filtro="" aria-pressed="true">Todos</button>
+            <button type="button" class="chip" data-tipo-filtro="function" aria-pressed="false">Function</button>
+            <button type="button" class="chip" data-tipo-filtro="procedure" aria-pressed="false">Procedure</button>
+            <button type="button" class="chip" data-tipo-filtro="view" aria-pressed="false">View</button>
+            <button type="button" class="chip" data-tipo-filtro="trigger" aria-pressed="false">Trigger</button>
+          </div>
+          <div class="tabela-wrap">
+            <table class="tabela larga" id="mapa-tabela">
+              <thead><tr><th class="num">Q</th><th>Tipo</th><th>Nome</th><th>O que faz</th><th>Onde aparece na interface</th></tr></thead>
+              <tbody>
+                <tr data-tipo="function"><td class="num">1</td><td><span class="tipo tipo-function">Function</span></td><td class="cod">fn_total_pedido</td><td>Soma quantidade × preço unitário dos itens. Devolve 0, e não NULL, se não houver itens.</td><td><a href="#novo-pedido">Novo pedido</a>: valor bruto parcial. <a href="#pedidos">Pedidos</a>: coluna Bruto.</td></tr>
+                <tr data-tipo="function"><td class="num">2</td><td><span class="tipo tipo-function">Function</span></td><td class="cod">fn_situacao_estoque</td><td>Classifica o produto em ESGOTADO, REPOR ou OK.</td><td><a href="#cardapio">Cardápio</a>: selos “Esgotado” e “Estoque baixo”.</td></tr>
+                <tr data-tipo="function"><td class="num">3</td><td><span class="tipo tipo-function">Function</span></td><td class="cod">fn_desconto_fidelidade</td><td>Devolve 10%, 5% ou 0% conforme os pedidos pagos do cliente.</td><td><a href="#novo-pedido">Novo pedido</a>: desconto mostrado ao finalizar.</td></tr>
+                <tr data-tipo="procedure"><td class="num">4</td><td><span class="tipo tipo-procedure">Procedure</span></td><td class="cod">sp_abrir_pedido</td><td>Cria o pedido e devolve o número pelo parâmetro OUT.</td><td><a href="#novo-pedido">Novo pedido</a>: etapa 1.</td></tr>
+                <tr data-tipo="procedure"><td class="num">5</td><td><span class="tipo tipo-procedure">Procedure</span></td><td class="cod">sp_adicionar_item</td><td>Dentro de uma transação, valida pedido, produto, quantidade, estoque e produto repetido. Grava o item com o preço atual do produto.</td><td><a href="#novo-pedido">Novo pedido</a>: etapa 2.</td></tr>
+                <tr data-tipo="procedure"><td class="num">6</td><td><span class="tipo tipo-procedure">Procedure</span></td><td class="cod">sp_finalizar_pedido</td><td>Calcula o valor, aplica o desconto e marca como PAGO, tudo em uma operação.</td><td><a href="#novo-pedido">Novo pedido</a>: etapa 3.</td></tr>
+                <tr data-tipo="procedure"><td class="num">7</td><td><span class="tipo tipo-procedure">Procedure</span></td><td class="cod">sp_reajustar_precos_categoria</td><td>Aplica um percentual ao preço de todos os produtos de uma categoria.</td><td><a href="#gerencia">Gerência</a>: Reajuste de preços.</td></tr>
+                <tr data-tipo="view"><td class="num">8</td><td><span class="tipo tipo-view">View</span></td><td class="cod">vw_cardapio</td><td>Produtos ativos, sem expor estoque nem estoque mínimo.</td><td><a href="#cardapio">Cardápio</a>.</td></tr>
+                <tr data-tipo="view"><td class="num">9</td><td><span class="tipo tipo-view">View</span></td><td class="cod">vw_pedidos_detalhados</td><td>Uma linha por pedido, com cliente, atendente, itens e valores.</td><td><a href="#pedidos">Pedidos</a>.</td></tr>
+                <tr data-tipo="view"><td class="num">10</td><td><span class="tipo tipo-view">View</span></td><td class="cod">vw_produtos_para_repor</td><td>Produtos ativos com estoque igual ou abaixo do mínimo.</td><td><a href="#gerencia">Gerência</a>: Produtos para repor.</td></tr>
+                <tr data-tipo="view"><td class="num">11</td><td><span class="tipo tipo-view">View</span></td><td class="cod">vw_vendas_por_categoria</td><td>Unidades e faturamento por categoria, só de pedidos pagos.</td><td><a href="#gerencia">Gerência</a>: Vendas por categoria.</td></tr>
+                <tr data-tipo="trigger"><td class="num">12</td><td><span class="tipo tipo-trigger">Trigger</span></td><td class="cod">trg_item_baixa_estoque</td><td>AFTER INSERT em item_pedido: subtrai do estoque a quantidade vendida.</td><td>Invisível. Adicione um item e veja o estoque mudar em <a href="#gerencia">Gerência</a>.</td></tr>
+                <tr data-tipo="trigger"><td class="num">13</td><td><span class="tipo tipo-trigger">Trigger</span></td><td class="cod">trg_item_devolve_estoque</td><td>AFTER DELETE em item_pedido: devolve ao estoque a quantidade removida (OLD).</td><td><a href="#novo-pedido">Novo pedido</a>: botão Remover.</td></tr>
+                <tr data-tipo="trigger"><td class="num">14</td><td><span class="tipo tipo-trigger">Trigger</span></td><td class="cod">trg_produto_historico_preco</td><td>AFTER UPDATE em produto: grava preço antigo, preço novo e usuário quando o preço muda.</td><td><a href="#gerencia">Gerência</a>: Histórico de preços.</td></tr>
+                <tr data-tipo="trigger"><td class="num">15</td><td><span class="tipo tipo-trigger">Trigger</span></td><td class="cod">trg_pedido_bloqueia_alteracao</td><td>BEFORE UPDATE em pedido: recusa alterações em pedidos PAGO ou CANCELADO (usa OLD.status).</td><td>Invisível. A interface não altera pedido pago. Mostre no Workbench (veja o roteiro).</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA 3 · CAMINHO DE UMA AÇÃO -->
+      <div id="painel-fluxos" class="pilha" role="tabpanel" aria-labelledby="aba-fluxos" hidden>
+        <div class="painel">
+          <h3 class="painel-titulo">O que acontece quando alguém clica</h3>
+          <p class="fonte">escolha uma ação e percorra os passos, do clique até o banco</p>
+          <div class="filtros" id="fluxo-escolha" role="group" aria-label="Escolher a ação">
+            <button type="button" class="chip" data-fluxo="adicionar" aria-pressed="true">Adicionar item</button>
+            <button type="button" class="chip" data-fluxo="remover" aria-pressed="false">Remover item</button>
+            <button type="button" class="chip" data-fluxo="finalizar" aria-pressed="false">Finalizar pedido</button>
+            <button type="button" class="chip" data-fluxo="reajustar" aria-pressed="false">Reajustar preços</button>
+          </div>
+          <p class="gatilho" id="fluxo-gatilho"></p>
+          <ol class="passos" id="fluxo-passos"></ol>
+          <div class="linha-botoes">
+            <button type="button" class="btn" id="fluxo-tocar">▶ Percorrer</button>
+          </div>
+          <p class="escala" id="fluxo-nota"></p>
+        </div>
+      </div>
+
+      <!-- ABA 4 · CONEXÃO COM O BANCO -->
+      <div id="painel-conexao" class="pilha" role="tabpanel" aria-labelledby="aba-conexao" hidden>
+        <div class="painel">
+          <h3 class="painel-titulo">Arquitetura da conexão</h3>
+          <p class="texto">O navegador não acessa o MySQL diretamente. Nesta aplicação, o JavaScript da página envia requisições HTTP para uma API local em Node.js e Express. Quando o MySQL está disponível, o servidor usa mysql2 para consultar o banco grao_da_serra e devolve os resultados em JSON. Se o banco estiver indisponível, a tela usa dados fictícios e simula as operações apenas nesta sessão; nada é gravado no MySQL. As credenciais ficam no arquivo local .env, que não é servido ao navegador nem versionado.</p>
+          <div class="cadeia" aria-label="Caminho dos dados">
+            <div class="no"><strong>Página</strong><small>HTML, CSS e JavaScript</small></div>
+            <span class="seta" aria-hidden="true">→</span>
+            <div class="no"><strong>API</strong><small>Node.js · Express · mysql2</small></div>
+            <span class="seta" aria-hidden="true">→</span>
+            <div class="no"><strong>MySQL</strong><small>banco grao_da_serra</small></div>
+          </div>
+        </div>
+
+        <div class="painel">
+          <h3 class="painel-titulo">Caminho de uma operação</h3>
+          <ul class="lista-check" id="check-conexao">
+            <li><strong>1.</strong><span><strong>Interface:</strong> app.js chama uma função assíncrona de dados.js.</span></li>
+            <li><strong>2.</strong><span><strong>API:</strong> dados.js usa fetch; server.js valida a requisição e executa SQL com parâmetros.</span></li>
+            <li><strong>3.</strong><span><strong>MySQL:</strong> views e procedures existentes fornecem os dados e aplicam as regras; triggers cuidam dos efeitos relacionados.</span></li>
+            <li><strong>4.</strong><span><strong>Resposta:</strong> a API devolve JSON. Erros SIGNAL das procedures são enviados à faixa de avisos.</span></li>
+          </ul>
+        </div>
+
+        <div class="painel">
+          <h3 class="painel-titulo">Funções da interface, rotas e operações no banco</h3>
+          <div class="tabela-wrap">
+            <table class="tabela media">
+              <thead><tr><th>Função em dados.js</th><th>Rota da API</th><th>Operação MySQL</th></tr></thead>
+              <tbody>
+                <tr><td class="cod">listarCardapio()</td><td class="cod">GET /api/cardapio</td><td class="cod">SELECT * FROM vw_cardapio</td></tr>
+                <tr><td class="cod">listarClientes()</td><td class="cod">GET /api/clientes</td><td class="cod">SELECT em cliente</td></tr>
+                <tr><td class="cod">listarFuncionarios()</td><td class="cod">GET /api/funcionarios</td><td class="cod">SELECT em funcionario</td></tr>
+                <tr><td class="cod">listarCategorias()</td><td class="cod">GET /api/categorias</td><td class="cod">SELECT em categoria</td></tr>
+                <tr><td class="cod">abrirPedido()</td><td class="cod">POST /api/pedidos</td><td class="cod">CALL sp_abrir_pedido; lê OUT na mesma conexão</td></tr>
+                <tr><td class="cod">adicionarItem()</td><td class="cod">POST /api/pedidos/:id/itens</td><td class="cod">CALL sp_adicionar_item</td></tr>
+                <tr><td class="cod">removerItem()</td><td class="cod">DELETE /api/pedidos/:id/itens/:produtoId</td><td class="cod">DELETE em item_pedido; trigger devolve estoque</td></tr>
+                <tr><td class="cod">listarItensPedido()</td><td class="cod">GET /api/pedidos/:id/itens</td><td class="cod">SELECT com JOIN de item_pedido e produto</td></tr>
+                <tr><td class="cod">finalizarPedido()</td><td class="cod">POST /api/pedidos/:id/finalizar</td><td class="cod">CALL sp_finalizar_pedido</td></tr>
+                <tr><td class="cod">listarPedidos()</td><td class="cod">GET /api/pedidos?status=...</td><td class="cod">SELECT * FROM vw_pedidos_detalhados</td></tr>
+                <tr><td class="cod">listarProdutosParaRepor()</td><td class="cod">GET /api/gerencia/reposicao</td><td class="cod">SELECT * FROM vw_produtos_para_repor</td></tr>
+                <tr><td class="cod">listarVendasPorCategoria()</td><td class="cod">GET /api/gerencia/vendas</td><td class="cod">SELECT * FROM vw_vendas_por_categoria</td></tr>
+                <tr><td class="cod">reajustarPrecos()</td><td class="cod">POST /api/gerencia/reajustes</td><td class="cod">CALL sp_reajustar_precos_categoria</td></tr>
+                <tr><td class="cod">listarHistoricoPrecos()</td><td class="cod">GET /api/gerencia/historico-precos</td><td class="cod">SELECT em historico_preco</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="painel">
+          <h3 class="painel-titulo">Configuração e execução local</h3>
+          <ol class="passos">
+            <li class="passo"><p>Execute <code>01_base_grao_da_serra.sql</code> uma vez para criar as tabelas e os dados iniciais. Depois execute <code>02_questoes_1_a_15_referencia.sql</code> para criar as functions, procedures, triggers e views. O segundo script recria esses objetos; não apaga as tabelas nem os dados.</p></li>
+            <li class="passo"><p>Instale Node.js e inicie o MySQL. Crie um usuário do banco para a aplicação com as permissões necessárias; evite usar o usuário administrador no uso diário.</p></li>
+            <li class="passo"><p>Na pasta do projeto, instale as dependências com <code>npm install</code>. Para usar o MySQL, copie <code>.env.example</code> para <code>.env</code> e preencha host, porta, banco, usuário e senha. Sem essa configuração, ou se o banco estiver indisponível, a página inicia com dados fictícios. O <code>.env</code> é local e está excluído do Git.</p></li>
+            <li class="passo"><p>Execute <code>npm start</code> e abra <a href="http://127.0.0.1:3000">http://127.0.0.1:3000</a>. A verificação da API fica em <a href="http://127.0.0.1:3000/api/health">/api/health</a>.</p></li>
+          </ol>
+          <p class="escala">Se o MySQL estiver em outra porta, ajuste DB_PORT no .env. Não abra index.html diretamente como arquivo: use o endereço servido pelo Node.js.</p>
+        </div>
+
+        <div class="painel">
+          <h3 class="painel-titulo">Usuário MySQL da aplicação</h3>
+          <p class="texto">Se ainda não tiver um usuário próprio, entre no Workbench com uma conta administradora e execute o exemplo abaixo. Troque a senha de exemplo e use a mesma no .env. Se já existe um usuário para a aplicação, configure as credenciais dele em vez de criar outro.</p>
+          <pre class="codigo" id="sql-usuario-app"><code>CREATE USER IF NOT EXISTS 'grao_app'@'127.0.0.1' IDENTIFIED BY 'TROQUE_ESTA_SENHA';
+GRANT SELECT ON grao_da_serra.* TO 'grao_app'@'127.0.0.1';
+GRANT DELETE ON grao_da_serra.item_pedido TO 'grao_app'@'127.0.0.1';
+GRANT EXECUTE ON grao_da_serra.* TO 'grao_app'@'127.0.0.1';</code></pre>
+          <div class="linha-botoes">
+            <button type="button" class="btn btn-sec btn-mini" data-copiar="#sql-usuario-app">Copiar SQL</button>
+          </div>
+        </div>
+
+        <div class="painel">
+          <h3 class="painel-titulo">Resumo da implementação</h3>
+          <p class="texto" id="resumo-conexao">A interface HTML/CSS/JavaScript chama funções assíncronas em dados.js. Essas funções usam fetch para acessar uma API Node.js/Express em server.js. O servidor usa mysql2 e as credenciais do .env para consultar o banco grao_da_serra; os dados voltam em JSON. Consultas de leitura usam as views do banco, e operações de pedido e reajuste chamam as procedures. O banco permanece responsável pelas regras e pelos triggers de estoque e auditoria.</p>
+          <div class="linha-botoes linha-fim">
+            <button type="button" class="btn btn-sec" data-copiar="#resumo-conexao">Copiar resumo</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ABA 5 · ROTEIRO DA DEMONSTRAÇÃO -->
+      <div id="painel-roteiro" class="pilha" role="tabpanel" aria-labelledby="aba-roteiro" hidden>
+        <div class="painel">
+          <h3 class="painel-titulo">Um roteiro que mostra cada recurso funcionando</h3>
+          <p class="fonte">use com o banco no estado inicial e deixe o botão “Explicações” ligado: a cada ação, o painel de baixo mostra o que o banco fez. <span id="roteiro-contagem">0 de 8 passos</span></p>
+          <ol class="roteiro" id="roteiro-lista">
+            <li><label><input type="checkbox"><span><strong>Cardápio.</strong> Mostre os 14 itens agrupados por categoria. “Esgotado” aparece desabilitado e “Estoque baixo” é o aviso discreto. A situação vem de fn_situacao_estoque, pela vw_cardapio, e a tela não mostra o estoque.</span></label></li>
+            <li><label><input type="checkbox"><span><strong>Novo pedido, etapa 1.</strong> Escolha Helena Rudnick e Bruno Tavares e clique em “Abrir pedido”. O número volta pelo parâmetro OUT de sp_abrir_pedido (11, no estado inicial).</span></label></li>
+            <li><label><input type="checkbox"><span><strong>Etapa 2.</strong> Adicione Mel silvestre, quantidade 11. Abra a Gerência: o mel entrou em “Produtos para repor”, porque o trigger baixou o estoque de 14 para 3, e o mínimo é 4.</span></label></li>
+            <li><label><input type="checkbox"><span><strong>Erros do banco.</strong> Tente quantidade 0 e depois 999. As mensagens (“Informe uma quantidade maior que zero.” e “Estoque insuficiente.”) vêm dos SIGNAL da procedure e aparecem na faixa de Avisos. A interface não valida nada.</span></label></li>
+            <li><label><input type="checkbox"><span><strong>Remover.</strong> Em Novo pedido, remova o mel. O estoque volta (trg_item_devolve_estoque) e o produto sai da lista de repor.</span></label></li>
+            <li><label><input type="checkbox"><span><strong>Finalizar com desconto.</strong> Em Pedidos, filtre “Aberto”, clique em “Continuar” no pedido 10 (Rafael, 5%) e finalize. Esperado: desconto de 5,00% e total de R$ 25,65.</span></label></li>
+            <li><label><input type="checkbox"><span><strong>Reajuste e histórico.</strong> Em Gerência, reajuste os Cafés em 10% e confirme. O histórico ganha 3 linhas (6,00 → 6,60, 11,50 → 12,65 e 8,00 → 8,80), gravadas pelo trigger. Os pedidos antigos não mudam de valor, porque o preço fica no item.</span></label></li>
+            <li>
+              <label><input type="checkbox"><span><strong>Trava no Workbench.</strong> Rode o comando abaixo. O trigger trg_pedido_bloqueia_alteracao recusa, porque o pedido 1 já está PAGO.</span></label>
+              <pre class="codigo" id="cod-bloqueio"><code>UPDATE pedido SET valor_total = 1 WHERE id_pedido = 1;</code></pre>
+              <div class="linha-botoes"><button type="button" class="btn btn-sec btn-mini" data-copiar="#cod-bloqueio">Copiar comando</button></div>
+            </li>
+          </ol>
+          <p class="escala">Para voltar ao estado inicial, rode DROP DATABASE grao_da_serra; e depois o script 01 e o 02 de novo (o 01 não apaga nada sozinho). Com os dados fictícios desta página, basta recarregar a página.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="viga" aria-hidden="true"></div>
+  <footer class="rodape">
+    <div class="dentro">Exercício prático de Banco de Dados · banco grao_da_serra · Aluna: Larissa Rademaker Gabriel</div>
+  </footer>
+</div>
+
+<!-- PAINEL "O QUE O BANCO FEZ" -->
+<aside class="explica" id="explica" aria-live="polite" aria-label="O que o banco fez" hidden>
+  <div class="dentro">
+    <div class="explica-cab">
+      <h3 class="explica-titulo" id="explica-titulo"></h3>
+      <button type="button" class="btn btn-sec btn-mini btn-icone" id="explica-fechar" aria-label="Fechar explicação">×</button>
+    </div>
+    <ol class="passos explica-passos" id="explica-passos"></ol>
+  </div>
+</aside>
+
+<script src="dados.js"></script>
+<script src="app.js"></script>
+<script src="bastidores.js"></script>
+</body>
+</html>
