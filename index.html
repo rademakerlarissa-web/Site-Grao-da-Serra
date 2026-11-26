@@ -368,9 +368,9 @@
         <div class="painel">
           <h3 class="painel-titulo">Configuração e execução local</h3>
           <ol class="passos">
-            <li class="passo"><p>Execute <code>01_base_grao_da_serra.sql</code> uma vez para criar as tabelas e os dados iniciais. Depois execute <code>02_questoes_1_a_15_referencia.sql</code> para criar as functions, procedures, triggers e views. O segundo script recria esses objetos; não apaga as tabelas nem os dados.</p></li>
+            <li class="passo"><p>Na pasta <code>sql/</code>, execute <code>01_base_grao_da_serra.sql</code> uma vez para criar o banco, as tabelas e os dados iniciais. Depois execute <code>02_questoes_1_a_15.sql</code> para criar as functions, procedures, triggers e views. O segundo script pode ser executado novamente para recriar esses objetos; não apaga as tabelas nem os dados.</p></li>
             <li class="passo"><p>Instale Node.js e inicie o MySQL. Crie um usuário do banco para a aplicação com as permissões necessárias; evite usar o usuário administrador no uso diário.</p></li>
-            <li class="passo"><p>Na pasta do projeto, instale as dependências com <code>npm install</code>. Para usar o MySQL, copie <code>.env.example</code> para <code>.env</code> e preencha host, porta, banco, usuário e senha. Sem essa configuração, ou se o banco estiver indisponível, a página inicia com dados fictícios. O <code>.env</code> é local e está excluído do Git.</p></li>
+            <li class="passo"><p>Na pasta do projeto, instale as dependências com <code>npm install</code>. Para usar o MySQL, crie o arquivo local <code>.env</code> com host, porta, banco, usuário e senha conforme o README. Sem essa configuração, ou se o banco estiver indisponível, a página inicia com dados fictícios. O <code>.env</code> é local e está excluído do Git.</p></li>
             <li class="passo"><p>Execute <code>npm start</code> e abra <a href="http://127.0.0.1:3000">http://127.0.0.1:3000</a>. A verificação da API fica em <a href="http://127.0.0.1:3000/api/health">/api/health</a>.</p></li>
           </ol>
           <p class="escala">Se o MySQL estiver em outra porta, ajuste DB_PORT no .env. Não abra index.html diretamente como arquivo: use o endereço servido pelo Node.js.</p>
